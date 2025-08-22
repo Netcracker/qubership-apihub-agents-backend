@@ -13,7 +13,7 @@ metadata:
     app.kubernetes.io/managed-by: helm
 spec:
   rules:
-    - host: '{{ .Values.qubershipApihubAgentsBackend.env.agentsBackendUrl }}'
+    - host: '{{ .Values.qubershipApihubAgentsBackend.ingress.url }}'
       http:
         paths:
           - path: /
@@ -23,3 +23,4 @@ spec:
                 name: qubership-apihub-agents-backend
                 port:
                   name: web
+{{- end }}
