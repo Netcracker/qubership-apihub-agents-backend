@@ -143,21 +143,21 @@ func main() {
 	r.HandleFunc("/api/v1/agents/{agentId}/namespaces", security.Secure(agentController.GetAgentNamespaces)).Methods(http.MethodGet) //TODO: remove it after frontend adaptation
 	r.HandleFunc("/api/v2/agents/{agentId}/namespaces/{namespace}/serviceNames", security.Secure(agentController.ListServiceNames)).Methods(http.MethodGet)
 
-	r.HandleFunc("/api/v2/agents/{agentId}/namespaces/{name}/workspaces/{workspaceId}/discover", security.Secure(discoveryController.StartDiscovery)).Methods(http.MethodPost)
-	r.HandleFunc("/api/v2/agents/{agentId}/namespaces/{name}/workspaces/{workspaceId}/services", security.Secure(discoveryController.ListDiscoveredServices)).Methods(http.MethodGet)
+	r.HandleFunc("/api/v2/agents/{agentId}/namespaces/{namespace}/workspaces/{workspaceId}/discover", security.Secure(discoveryController.StartDiscovery)).Methods(http.MethodPost)
+	r.HandleFunc("/api/v2/agents/{agentId}/namespaces/{namespace}/workspaces/{workspaceId}/services", security.Secure(discoveryController.ListDiscoveredServices)).Methods(http.MethodGet)
 
-	r.HandleFunc("/api/v2/agents/{agentId}/namespaces/{name}/workspaces/{workspaceId}/services/{serviceId}/specs/{fileId}", security.Secure(specificationsController.GetServiceSpecification)).Methods(http.MethodGet)
+	r.HandleFunc("/api/v2/agents/{agentId}/namespaces/{namespace}/workspaces/{workspaceId}/services/{serviceId}/specs/{fileId}", security.Secure(specificationsController.GetServiceSpecification)).Methods(http.MethodGet)
 
-	r.HandleFunc("/api/v2/agents/{agentId}/namespaces/{name}/workspaces/{workspaceId}/snapshots", security.Secure(snapshotsController.CreateSnapshot)).Methods(http.MethodPost)
-	r.HandleFunc("/api/v2/agents/{agentId}/namespaces/{name}/workspaces/{workspaceId}/snapshots", security.Secure(snapshotsController.ListSnapshots)).Methods(http.MethodGet)
-	r.HandleFunc("/api/v2/agents/{agentId}/namespaces/{name}/workspaces/{workspaceId}/snapshots/{version}", security.Secure(snapshotsController.GetSnapshot)).Methods(http.MethodGet)
+	r.HandleFunc("/api/v2/agents/{agentId}/namespaces/{namespace}/workspaces/{workspaceId}/snapshots", security.Secure(snapshotsController.CreateSnapshot)).Methods(http.MethodPost)
+	r.HandleFunc("/api/v2/agents/{agentId}/namespaces/{namespace}/workspaces/{workspaceId}/snapshots", security.Secure(snapshotsController.ListSnapshots)).Methods(http.MethodGet)
+	r.HandleFunc("/api/v2/agents/{agentId}/namespaces/{namespace}/workspaces/{workspaceId}/snapshots/{version}", security.Secure(snapshotsController.GetSnapshot)).Methods(http.MethodGet)
 
 	r.HandleFunc("/api/v2/security/authCheck", security.Secure(namespaceSecurityController.StartAuthSecurityCheck)).Methods(http.MethodPost)
 	r.HandleFunc("/api/v3/security/authCheck", security.Secure(namespaceSecurityController.GetAuthSecurityCheckReports)).Methods(http.MethodGet)
 	r.HandleFunc("/api/v2/security/authCheck/{processId}/status", security.Secure(namespaceSecurityController.GetAuthSecurityCheckStatus)).Methods(http.MethodGet)
 	r.HandleFunc("/api/v2/security/authCheck/{processId}/report", security.Secure(namespaceSecurityController.GetAuthSecurityCheckResult)).Methods(http.MethodGet)
 
-	const proxyPath = "/agents/{agentId}/namespaces/{name}/services/{serviceId}/proxy/"
+	const proxyPath = "/agents/{agentId}/namespaces/{namespace}/services/{serviceId}/proxy/"
 	if systemInfoService.InsecureProxyEnabled() {
 		r.PathPrefix(proxyPath).HandlerFunc(agentProxyController.Proxy)
 	} else {

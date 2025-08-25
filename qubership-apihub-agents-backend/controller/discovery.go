@@ -37,7 +37,7 @@ type discoveryControllerImpl struct {
 }
 
 func (d discoveryControllerImpl) StartDiscovery(w http.ResponseWriter, r *http.Request) {
-	namespace := getStringParam(r, "name")
+	namespace := getStringParam(r, "namespace")
 	agentId := getStringParam(r, "agentId")
 	workspaceId := getStringParam(r, "workspaceId")
 
@@ -50,7 +50,7 @@ func (d discoveryControllerImpl) StartDiscovery(w http.ResponseWriter, r *http.R
 }
 
 func (d discoveryControllerImpl) ListDiscoveredServices(w http.ResponseWriter, r *http.Request) {
-	namespace := getStringParam(r, "name")
+	namespace := getStringParam(r, "namespace")
 	agentId := getStringParam(r, "agentId")
 	workspaceId := getStringParam(r, "workspaceId")
 

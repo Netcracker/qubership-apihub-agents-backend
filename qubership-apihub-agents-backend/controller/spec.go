@@ -39,7 +39,7 @@ type specificationsControllerImpl struct {
 
 func (s specificationsControllerImpl) GetServiceSpecification(w http.ResponseWriter, r *http.Request) {
 	agentId := getStringParam(r, "agentId")
-	namespace := getStringParam(r, "name")
+	namespace := getStringParam(r, "namespace")
 	workspaceId := getStringParam(r, "workspaceId")
 	serviceId, err := getUnescapedStringParam(r, "serviceId")
 	if err != nil {

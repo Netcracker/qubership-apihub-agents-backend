@@ -10,6 +10,7 @@ It is ready for usage Helm chart.
 | Name       | Version | Mandatory/Optional | Comment |
 |------------|---------|--------------------|---------|
 | Kubernetes | 1.23+   | Mandatory          |         |
+| PostgreSQL | 14+     | Mandatory          |         |
 
 ## HWE
 

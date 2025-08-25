@@ -223,6 +223,7 @@ func (s systemInfoServiceImpl) setInsecureProxy() {
 func (s systemInfoServiceImpl) setDraftsCleanupSchedule() {
 	schedule := os.Getenv(DRAFTS_CLEANUP_SCHEDULE)
 	if schedule == "" {
+		//TODO: default value should be aligned with other cleanup jobs in APIHUB
 		schedule = "0 2 * * 0" // 2:00 AM on Sunday
 	}
 	s.systemInfoMap[DRAFTS_CLEANUP_SCHEDULE] = schedule

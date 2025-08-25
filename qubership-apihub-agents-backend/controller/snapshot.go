@@ -44,7 +44,7 @@ type snapshotControllerImpl struct {
 
 func (s snapshotControllerImpl) CreateSnapshot(w http.ResponseWriter, r *http.Request) {
 	var err error
-	namespace := getStringParam(r, "name")
+	namespace := getStringParam(r, "namespace")
 	agentId := getStringParam(r, "agentId")
 	workspaceId := getStringParam(r, "workspaceId")
 	agent, err := s.agentService.GetAgent(agentId)
@@ -177,7 +177,7 @@ func (s snapshotControllerImpl) CreateSnapshot(w http.ResponseWriter, r *http.Re
 }
 
 func (s snapshotControllerImpl) ListSnapshots(w http.ResponseWriter, r *http.Request) {
-	namespace := getStringParam(r, "name")
+	namespace := getStringParam(r, "namespace")
 	workspaceId := getStringParam(r, "workspaceId")
 	var err error
 	page := 0
@@ -251,7 +251,7 @@ func (s snapshotControllerImpl) ListSnapshots(w http.ResponseWriter, r *http.Req
 }
 
 func (s snapshotControllerImpl) GetSnapshot(w http.ResponseWriter, r *http.Request) {
-	namespace := getStringParam(r, "name")
+	namespace := getStringParam(r, "namespace")
 	agentId := getStringParam(r, "agentId")
 	workspaceId := getStringParam(r, "workspaceId")
 	version := getStringParam(r, "version")
