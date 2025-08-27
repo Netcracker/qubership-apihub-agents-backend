@@ -132,6 +132,7 @@ func main() {
 	specificationsController := controller.NewSpecificationsController(agentClient, agentService)
 	namespaceSecurityController := controller.NewNamespaceSecurityController(namespaceSecurityService, excelService)
 	agentProxyController := controller.NewAgentProxyController(agentService)
+	apiDocsController := controller.NewApiDocsController(basePath)
 
 	healthController := controller.NewHealthController(readyChan)
 
@@ -163,6 +164,9 @@ func main() {
 	} else {
 		r.PathPrefix(proxyPath).HandlerFunc(security.SecureProxy(agentProxyController.Proxy))
 	}
+
+	r.HandleFunc("/v3/api-docs/apihub-swagger-config", apiDocsController.GetSpecsUrls).Methods(http.MethodGet)
+	r.HandleFunc("/v3/api-docs/{specName}", apiDocsController.GetSpec).Methods(http.MethodGet)
 
 	r.HandleFunc("/live", healthController.HandleLiveRequest).Methods(http.MethodGet)
 	r.HandleFunc("/ready", healthController.HandleReadyRequest).Methods(http.MethodGet)

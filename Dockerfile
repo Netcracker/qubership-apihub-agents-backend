@@ -41,6 +41,7 @@ WORKDIR /app/qubership-apihub-agents-backend
 
 COPY --from=builder /workspace/qubership-apihub-agents-backend/qubership-apihub-agents-backend ./qubership-apihub-agents-backend
 COPY --from=builder /workspace/qubership-apihub-agents-backend/resources ./resources
+COPY docs/api ./api
 
 RUN chmod -R a+rwx /app
 
