@@ -140,7 +140,7 @@ func main() {
 	r.HandleFunc("/api/v2/agents", security.Secure(agentController.ProcessAgentSignal)).Methods(http.MethodPost)
 	r.HandleFunc("/api/v2/agents/{id}", security.Secure(agentController.GetAgent)).Methods(http.MethodGet)
 	r.HandleFunc("/api/v2/agents/{agentId}/namespaces", security.Secure(agentController.GetAgentNamespaces)).Methods(http.MethodGet)
-	r.HandleFunc("/api/v1/agents/{agentId}/namespaces", security.Secure(agentController.GetAgentNamespaces)).Methods(http.MethodGet) //TODO: remove it after frontend adaptation
+	r.HandleFunc("/api/v1/agents/{agentId}/namespaces", security.Secure(agentController.GetAgentNamespaces)).Methods(http.MethodGet) //deprecated
 	r.HandleFunc("/api/v2/agents/{agentId}/namespaces/{namespace}/serviceNames", security.Secure(agentController.ListServiceNames)).Methods(http.MethodGet)
 
 	r.HandleFunc("/api/v2/agents/{agentId}/namespaces/{namespace}/workspaces/{workspaceId}/discover", security.Secure(discoveryController.StartDiscovery)).Methods(http.MethodPost)

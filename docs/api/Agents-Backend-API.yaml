@@ -170,6 +170,45 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/agents/{agentId}/namespaces:
+    get:
+      tags:
+        - Agents
+      summary: Get agent namespaces
+      deprecated: true
+      description: Retrieves the list of namespaces available for the specified agent
+      operationId: getAgentNamespacesV1
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+        - ApiKeyAuth: []
+        - PersonalAccessToken: []
+      parameters:
+        - $ref: '#/components/parameters/AgentId'
+      responses:
+        '200':
+          description: Agent namespaces
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  namespaces:
+                    type: array
+                    items:
+                      type: string
+                    description: List of available namespaces
+                  cloudName:
+                    type: string
+                    description: Cloud name
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '424':
+          $ref: '#/components/responses/FailedDependency'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /api/v2/agents/{agentId}/namespaces:
     get:
       tags:
