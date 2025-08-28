@@ -24,7 +24,3 @@ qubershipApihubAgentsBackend:
 
     apihubUrl: 'http://qubership-apihub-ui.qubership-apihub.svc.cluster.local:8080'
     accessToken: '' # set access token from qubership-apihub
-
-  ingress:
-    enabled: true
-    url: 'qubership-apihub-agents-backend.localtest.me'

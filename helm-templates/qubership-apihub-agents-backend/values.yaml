@@ -50,10 +50,3 @@ qubershipApihubAgentsBackend:
 
     # Optional; Allows to set extra allowed origin to CORS header. Used for FE debugging. Should be empty on prod evs.; If not set, default value: ""; Example: https://localhost:5137
     originAllowed: ''
-
-  # Section with ingress parameters for Qubership APIHUB Agents Backend.
-  ingress:
-    # Flag to enable/disable http UI ingress creation
-    enabled: false
-    # Mandatory; Factual Qubership APIHUB Agents Backend Ingress URL in your environment.; If not set, default value: ""; Example: qubership-apihub-agents-backend.localhost
-    url: ''
