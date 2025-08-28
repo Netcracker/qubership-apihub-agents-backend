@@ -3,6 +3,9 @@
 A Go-based microservice backend that provides management and orchestration capabilities for Qubership APIHUB agents.
 This service handles agent registration, service discovery, snapshot management, and security checks.
 
+## High Level architecture
+![APIHUB Architecture](docs/recources/arch_diagram.png)
+
 ## API Documentation
 
 API documentation is available in the [OpenAPI specification](docs/api/Agents-Backend-API.yaml).
