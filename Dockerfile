@@ -24,15 +24,14 @@ COPY qubership-apihub-agents-backend ./qubership-apihub-agents-backend
 
 WORKDIR /workspace/qubership-apihub-agents-backend
 
-RUN go mod tidy
-
-RUN set GOSUMDB=off && set CGO_ENABLED=0 && go mod tidy && go mod download && GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build .
+RUN GOSUMDB=off CGO_ENABLED=0 go mod tidy && go mod download && GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build .
 
 
 FROM docker.io/golang:1.23.4-alpine3.21
 
 USER root
 
+# hadolint ignore=DL3018
 RUN apk --no-cache add curl
 
 WORKDIR /app/qubership-apihub-agents-backend
