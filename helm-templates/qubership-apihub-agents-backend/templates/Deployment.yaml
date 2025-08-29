@@ -70,10 +70,10 @@ spec:
               value: '{{.Values.qubershipApihubAgentsBackend.env.originAllowed}}'
           resources:
             requests:
-              cpu: {{.Values.qubershipApihubAgentsBackend.resource.cpu.request}}
+              cpu: '{{.Values.qubershipApihubAgentsBackend.resource.cpu.request}}'
               memory: '{{.Values.qubershipApihubAgentsBackend.resource.memory.request}}'
             limits:
-              cpu: {{.Values.qubershipApihubAgentsBackend.resource.cpu.limit}}
+              cpu: '{{.Values.qubershipApihubAgentsBackend.resource.cpu.limit}}'
               memory: '{{.Values.qubershipApihubAgentsBackend.resource.memory.limit}}'
           livenessProbe:
             httpGet:
