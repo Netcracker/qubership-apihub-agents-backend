@@ -5,7 +5,7 @@ cluster.
 
 It is ready for usage Helm chart.
 
-## 3rd party dependencies
+## Third-party dependencies
 
 | Name       | Version | Mandatory/Optional | Comment |
 |------------|---------|--------------------|---------|
@@ -32,13 +32,13 @@ It is ready for usage Helm chart.
 
 In order to deploy Qubership APIHUB Agents Backend to your k8s cluster execute the following command:
 
-```
+```bash
 helm install qubership-apihub-agents-backend -n qubership-apihub -f ./qubership-apihub-agents-backend/values.yaml ./qubership-apihub-agents-backend
 ```
 
 In order to uninstall Qubership APIHUB Agents Backend from your k8s cluster execute the following command:
 
-```
+```bash
 helm uninstall qubership-apihub-agents-backend -n qubership-apihub-agents-backend
 ```
 
@@ -50,6 +50,6 @@ File `local-k8s-values.yaml` has predefined deploy parameters for deploy to loca
 
 Execute the following command to deploy Qubership APIHUB Agents Backend:
 
-```
+```bash
 helm install qubership-apihub-agents-backend -n qubership-apihub  -f ./qubership-apihub-agents-backend/local-k8s-values.yaml ./qubership-apihub-agents-backend
 ```

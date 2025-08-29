@@ -33,12 +33,12 @@ jobs:
   build-docker-image:
     uses: netcracker/qubership-apihub-ci/.github/workflows/docker-ci.yml@main
     with:
-        name: qubership-apihub-agents-backend
-        file: Dockerfile
-        context: ""
-        platforms: linux/amd64,linux/arm64
-        labels: |
-            maintainer=qubership
+      name: qubership-apihub-agents-backend
+      file: Dockerfile
+      context: ""
+      platforms: linux/amd64,linux/arm64
+      labels: |
+        maintainer=qubership
 
   # run-e2e-tests:
   #   uses: netcracker/qubership-apihub-ci/.github/workflows/run-e2e-tests.yml@main

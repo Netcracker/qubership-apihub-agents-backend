@@ -1006,7 +1006,7 @@ paths:
       description: Proxy endpoint to service
       operationId: getAgentsIdNamespacesIdServicesProxy
       security:
-        - { }
+        - {}
       tags:
         - Agent
         - TryIt

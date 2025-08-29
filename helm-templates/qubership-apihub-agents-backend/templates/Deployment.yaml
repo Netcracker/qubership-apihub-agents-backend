@@ -5,7 +5,7 @@ metadata:
   name: qubership-apihub-agents-backend
   labels:
     name: qubership-apihub-agents-backend
-    app.kubernetes.io/version: '{{ .Values.qubershipApihubAgentsBackend.version }}'
+    app.kubernetes.io/version: '{{.Values.qubershipApihubAgentsBackend.version}}'
     app.kubernetes.io/component: 'backend'
     app.kubernetes.io/technology: 'go'
     app.kubernetes.io/part-of: qubership-apihub-agents-backend
@@ -20,7 +20,7 @@ spec:
     metadata:
       labels:
         name: qubership-apihub-agents-backend
-        app.kubernetes.io/version: '{{ .Values.qubershipApihubAgentsBackend.version }}'
+        app.kubernetes.io/version: '{{.Values.qubershipApihubAgentsBackend.version}}'
         app.kubernetes.io/component: 'backend'
         app.kubernetes.io/part-of: qubership-apihub-agents-backend
         app.kubernetes.io/managed-by: helm
@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
         - name: qubership-apihub-agents-backend
-          image: '{{ .Values.qubershipApihubAgentsBackend.image.repository }}:{{ .Values.qubershipApihubAgentsBackend.image.tag }}'
+          image: '{{.Values.qubershipApihubAgentsBackend.image.repository}}:{{.Values.qubershipApihubAgentsBackend.image.tag}}'
           imagePullPolicy: IfNotPresent
           ports:
             - name: web
@@ -36,13 +36,13 @@ spec:
               protocol: TCP
           env:
             - name: LOG_LEVEL
-              value: '{{ .Values.qubershipApihubAgentsBackend.env.logLevel }}'
+              value: '{{.Values.qubershipApihubAgentsBackend.env.logLevel}}'
             - name: AGENTS_BACKEND_POSTGRESQL_HOST
-              value: '{{ .Values.qubershipApihubAgentsBackend.env.database.host }}'
+              value: '{{.Values.qubershipApihubAgentsBackend.env.database.host}}'
             - name: AGENTS_BACKEND_POSTGRESQL_PORT
-              value: '{{ .Values.qubershipApihubAgentsBackend.env.database.port }}'
+              value: '{{.Values.qubershipApihubAgentsBackend.env.database.port}}'
             - name: AGENTS_BACKEND_POSTGRESQL_DB_NAME
-              value: '{{ .Values.qubershipApihubAgentsBackend.env.database.name }}'
+              value: '{{.Values.qubershipApihubAgentsBackend.env.database.name}}'
             - name: AGENTS_BACKEND_POSTGRESQL_USERNAME
               valueFrom:
                 secretKeyRef:
@@ -54,7 +54,7 @@ spec:
                   name: qubership-apihub-agents-backend-db-secret
                   key: postgresql_password
             - name: APIHUB_URL
-              value: '{{ .Values.qubershipApihubAgentsBackend.env.apihubUrl }}'
+              value: '{{.Values.qubershipApihubAgentsBackend.env.apihubUrl}}'
             - name: APIHUB_ACCESS_TOKEN
               valueFrom:
                 secretKeyRef:
@@ -70,11 +70,11 @@ spec:
               value: '{{.Values.qubershipApihubAgentsBackend.env.originAllowed}}'
           resources:
             requests:
-              cpu: {{ .Values.qubershipApihubAgentsBackend.resource.cpu.request }}
-              memory: '{{ .Values.qubershipApihubAgentsBackend.resource.memory.request }}'
+              cpu: {{.Values.qubershipApihubAgentsBackend.resource.cpu.request}}
+              memory: '{{.Values.qubershipApihubAgentsBackend.resource.memory.request}}'
             limits:
-              cpu: {{ .Values.qubershipApihubAgentsBackend.resource.cpu.limit }}
-              memory: '{{ .Values.qubershipApihubAgentsBackend.resource.memory.limit }}'
+              cpu: {{.Values.qubershipApihubAgentsBackend.resource.cpu.limit}}
+              memory: '{{.Values.qubershipApihubAgentsBackend.resource.memory.limit}}'
           livenessProbe:
             httpGet:
               path: /live

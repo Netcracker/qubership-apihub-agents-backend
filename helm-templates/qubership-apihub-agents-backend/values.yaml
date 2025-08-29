@@ -39,7 +39,7 @@ qubershipApihubAgentsBackend:
     # Mandatory; Provide admin access token for your Qubership APIHUB; If not set, default value: ""; Example: access-token-12345
     accessToken: ''
 
-    #Optional; If specified, during discovery the package structure is copied from the default workspace to the target discovery workspace.; If not set, default value: ""; Example: QS
+    # Optional; If specified, during discovery the package structure is copied from the default workspace to the target discovery workspace.; If not set, default value: ""; Example: QS
     defaultWorkspaceId: ''
 
     # Optional; Schedule for the drafts cleanup job. If not set, default value: "0 2 * * 0"; Example: "* * * * *"
