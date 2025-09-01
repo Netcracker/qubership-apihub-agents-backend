@@ -39,9 +39,9 @@ type ApihubClient interface {
 	GetPatByPAT(ctx context.Context, token string) (*view.PersonalAccessTokenExtAuthView, error)
 
 	GetPackageById(ctx context.Context, id string) (*view.SimplePackage, error)
-	GetPackageByServiceName(ctx context.Context, workspaceId string, serviceName string) (*view.SimplePackage, error)
+	GetPackageByServiceName(ctx context.Context, workspaceId string, serviceName string) (*view.PackagesInfo, error)
 	CreatePackage(ctx context.Context, pkg view.PackageCreateRequest) (string, error)
-	GetPackages(ctx context.Context, searchReq view.PackagesSearchReq) (*view.SimplePackages, error)
+	GetPackages(ctx context.Context, searchReq view.PackagesSearchReq) (*view.Packages, error)
 	GetUserPackagesPromoteStatuses(ctx context.Context, packagesReq view.PackagesReq) (view.AvailablePackagePromoteStatuses, error)
 	GetVersion(ctx context.Context, id, version string) (*view.VersionContent, error)
 	Publish(ctx context.Context, config view.BuildConfig, src []byte, clientBuild bool, builderId string, saveSources bool, dependencies []string) (string, error)
@@ -153,7 +153,7 @@ func (a apihubClientImpl) GetPackageById(ctx context.Context, id string) (*view.
 	return &pkg, nil
 }
 
-func (a apihubClientImpl) GetPackageByServiceName(ctx context.Context, workspaceId string, serviceName string) (*view.SimplePackage, error) {
+func (a apihubClientImpl) GetPackageByServiceName(ctx context.Context, workspaceId string, serviceName string) (*view.PackagesInfo, error) {
 	req := a.makeRequest(ctx)
 
 	resp, err := req.Get(fmt.Sprintf("%s/api/v2/packages?kind=package&serviceName=%s&parentId=%s&showAllDescendants=true", a.apihubUrl, url.PathEscape(serviceName), workspaceId))
@@ -170,7 +170,7 @@ func (a apihubClientImpl) GetPackageByServiceName(ctx context.Context, workspace
 		return nil, fmt.Errorf("failed to get package id by service name -  %s : status code %d %v", serviceName, resp.StatusCode(), err)
 	}
 
-	var packages view.SimplePackages
+	var packages view.Packages
 
 	err = json.Unmarshal(resp.Body(), &packages)
 	if err != nil {
@@ -202,7 +202,7 @@ func (a apihubClientImpl) CreatePackage(ctx context.Context, pkg view.PackageCre
 		}
 		return "", fmt.Errorf("failed to create package by request -  %v : status code %d %v", pkg, resp.StatusCode(), err)
 	}
-	var res view.PackageResponse
+	var res view.SimplePackage
 	err = json.Unmarshal(resp.Body(), &res)
 	if err != nil {
 		return "", err
@@ -210,7 +210,7 @@ func (a apihubClientImpl) CreatePackage(ctx context.Context, pkg view.PackageCre
 	return res.Id, nil
 }
 
-func (a apihubClientImpl) GetPackages(ctx context.Context, searchReq view.PackagesSearchReq) (*view.SimplePackages, error) {
+func (a apihubClientImpl) GetPackages(ctx context.Context, searchReq view.PackagesSearchReq) (*view.Packages, error) {
 	req := a.makeRequest(ctx)
 
 	base, err := url.Parse(fmt.Sprintf("%s/api/v2/packages", a.apihubUrl))
@@ -261,7 +261,7 @@ func (a apihubClientImpl) GetPackages(ctx context.Context, searchReq view.Packag
 		return nil, fmt.Errorf("failed to get packages by request -  %v : status code %d %v", searchReq, resp.StatusCode(), err)
 	}
 
-	var packages view.SimplePackages
+	var packages view.Packages
 
 	err = json.Unmarshal(resp.Body(), &packages)
 	if err != nil {

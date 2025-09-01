@@ -28,7 +28,7 @@ func MakeUserContext(r *http.Request) context.Context {
 	user := auth.User(r)
 	userId := user.GetID()
 
-	sysRoles := user.GetExtensions().Values(SystemRoleExt) //TODO: slice ?
+	sysRoles := user.GetExtensions().Values(SystemRoleExt)
 
 	token := getAuthorizationToken(r)
 	apiKey := getApihubApiKey(r)
@@ -54,7 +54,7 @@ type securityContextImpl struct {
 	apiKey              string
 	personalAccessToken string
 	isSystemCtx         bool
-	systemRoles         []string // TODO: bad naming
+	systemRoles         []string
 }
 
 func getAuthorizationToken(r *http.Request) string {

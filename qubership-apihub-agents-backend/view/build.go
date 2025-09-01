@@ -38,7 +38,6 @@ type BuildConfig struct {
 type BCRef struct {
 	RefId   string `json:"refId"`
 	Version string `json:"version"`
-	// TODO: RelationType?
 }
 
 type BCFile struct {

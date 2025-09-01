@@ -25,27 +25,50 @@ const KindDashbord PackageKind = "dashboard"
 
 type SimplePackage struct {
 	Id                    string              `json:"packageId"`
-	Alias                 string              `json:"alias"`
+	Alias                 string              `json:"alias" validate:"required"`
 	ParentId              string              `json:"parentId"`
-	Kind                  string              `json:"kind"`
-	Name                  string              `json:"name"`
+	Kind                  string              `json:"kind" validate:"required"`
+	Name                  string              `json:"name" validate:"required"`
 	Description           string              `json:"description"`
 	IsFavorite            bool                `json:"isFavorite"`
 	ServiceName           string              `json:"serviceName,omitempty"`
 	ImageUrl              string              `json:"imageUrl"`
 	Parents               []ParentPackageInfo `json:"parents"`
-	UserRole              string              `json:"userRole"`
 	DefaultRole           string              `json:"defaultRole"`
+	UserPermissions       []string            `json:"permissions"`
 	DeletionDate          *time.Time          `json:"-"`
 	DeletedBy             string              `json:"-"`
 	CreatedBy             string              `json:"-"`
-	CreatedAt             time.Time           `json:"createdAt,omitempty"`
-	ReleaseVersionPattern string              `json:"releaseVersionPattern"`
+	CreatedAt             time.Time           `json:"-"`
 	DefaultReleaseVersion string              `json:"defaultReleaseVersion"`
+	DefaultVersion        string              `json:"defaultVersion"`
+	ReleaseVersionPattern string              `json:"releaseVersionPattern"`
+	ExcludeFromSearch     *bool               `json:"excludeFromSearch,omitempty"`
+	RestGroupingPrefix    string              `json:"restGroupingPrefix,omitempty"`
 }
 
-type SimplePackages struct {
-	Packages []SimplePackage `json:"packages"`
+type Packages struct {
+	Packages []PackagesInfo `json:"packages"`
+}
+
+type PackagesInfo struct {
+	Id                        string              `json:"packageId"`
+	Alias                     string              `json:"alias"`
+	ParentId                  string              `json:"parentId"`
+	Kind                      string              `json:"kind"`
+	Name                      string              `json:"name"`
+	Description               string              `json:"description"`
+	IsFavorite                bool                `json:"isFavorite,omitempty"`
+	ServiceName               string              `json:"serviceName,omitempty"`
+	ImageUrl                  string              `json:"imageUrl,omitempty"`
+	Parents                   []ParentPackageInfo `json:"parents"`
+	DefaultRole               string              `json:"defaultRole"`
+	UserPermissions           []string            `json:"permissions,omitempty"`
+	LastReleaseVersionDetails *VersionDetails     `json:"lastReleaseVersionDetails,omitempty"`
+	RestGroupingPrefix        string              `json:"restGroupingPrefix,omitempty"`
+	ReleaseVersionPattern     string              `json:"releaseVersionPattern,omitempty"`
+	CreatedAt                 time.Time           `json:"createdAt,omitempty"`
+	DeletedAt                 *time.Time          `json:"deletedAt,omitempty"`
 }
 
 type ParentPackageInfo struct {
@@ -55,6 +78,12 @@ type ParentPackageInfo struct {
 	Kind     string `json:"kind"`
 	Name     string `json:"name"`
 	ImageUrl string `json:"imageUrl"`
+}
+
+type VersionDetails struct {
+	Version           string         `json:"version"`
+	NotLatestRevision bool           `json:"notLatestRevision,omitempty"`
+	Summary           *ChangeSummary `json:"summary,omitempty"`
 }
 
 type PackageCreateRequest struct {
@@ -68,18 +97,6 @@ type PackageCreateRequest struct {
 	DefaultRole           string `json:"defaultRole"`
 	ReleaseVersionPattern string `json:"releaseVersionPattern"`
 	ExcludeFromSearch     *bool  `json:"excludeFromSearch"`
-}
-
-// TODO: update!
-type PackageResponse struct {
-	Id          string `json:"id"`
-	Alias       string `json:"alias" validate:"required"`
-	Name        string `json:"name" validate:"required"`
-	Kind        string `json:"kind" validate:"required"`
-	ParentId    string `json:"parentId" validate:"required"`
-	Description string `json:"description"`
-	ServiceName string `json:"serviceName"`
-	ImageUrl    string `json:"imageUrl"`
 }
 
 type AvailablePackagePromoteStatuses map[string][]string // map[packageId][]version status

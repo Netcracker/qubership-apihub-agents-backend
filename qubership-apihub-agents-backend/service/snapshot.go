@@ -102,7 +102,7 @@ func (s *snapshotServiceImpl) GetSnapshot(ctx context.Context, namespace string,
 		Version:           versionContent.Version,
 		ApiTypes:          versionContent.ApiTypes,
 		PreviousVersion:   versionContent.PreviousVersion,
-		PublishedAt:       string(publishedAtStr), //todo test this
+		PublishedAt:       string(publishedAtStr),
 		Services:          make([]view.ServiceWithChanges, len(references.References)),
 		ViewSnapshotUrl:   fmt.Sprintf("%s/portal/packages/%s/%s/overview/summary", s.systemInfoService.GetApihubUrl(), dashboardId, url.PathEscape(groupVersionForUrl)),
 		NotLatestRevision: versionContent.NotLatestRevision,
@@ -518,7 +518,6 @@ func (s *snapshotServiceImpl) prepareNamespaceGroup(ctx context.Context, namespa
 	if err != nil {
 		return "", fmt.Errorf("unable to get group %s: %s", namespaceGroupId, err)
 	}
-	//todo what if group.Kind != "group"?
 	if namespaceGroup == nil {
 		cloudGroupParentId := fmt.Sprintf("%s.%s", workspaceId, view.DefaultSnapshotsGroupAlias)
 		parentGroup, err := s.apihubClient.GetPackageById(ctx, cloudGroupParentId)
@@ -530,6 +529,8 @@ func (s *snapshotServiceImpl) prepareNamespaceGroup(ctx context.Context, namespa
 			if err != nil {
 				return "", fmt.Errorf("unable to create cloud parent group %s: %s", cloudGroupParentId, err)
 			}
+		} else if parentGroup.Kind != string(view.KindGroup) {
+			return "", fmt.Errorf("package %s exists but is not a group (kind: %s)", cloudGroupParentId, parentGroup.Kind)
 		}
 		cloudGroupId := fmt.Sprintf("%s.%s", cloudGroupParentId, utils.ToId(cloudName))
 		err = s.createGroupIfRequired(ctx, cloudGroupId, cloudName, cloudGroupParentId)
@@ -545,6 +546,8 @@ func (s *snapshotServiceImpl) prepareNamespaceGroup(ctx context.Context, namespa
 		if err != nil {
 			return "", fmt.Errorf("unable to create namespace group %s: %s", namespaceGroupId, err)
 		}
+	} else if namespaceGroup.Kind != string(view.KindGroup) {
+		return "", fmt.Errorf("package %s exists but is not a group (kind: %s)", namespaceGroupId, namespaceGroup.Kind)
 	}
 	return namespaceGroupId, nil
 }
@@ -570,7 +573,15 @@ func (s *snapshotServiceImpl) createGroupHierarchy(ctx context.Context, targetGr
 		if err != nil {
 			return fmt.Errorf("unable to get group %s: %s", groupId, err)
 		}
-		//todo what if group.Kind != "group"?
+
+		//the first part of targetGroupId is workspace - only check existence, don't create
+		if i == 0 {
+			if group == nil {
+				return fmt.Errorf("workspace %s does not exist", groupId)
+			}
+			continue
+		}
+
 		if group == nil {
 			excludeFromSearch := true
 			_, err := s.apihubClient.CreatePackage(ctx, view.PackageCreateRequest{
@@ -584,6 +595,8 @@ func (s *snapshotServiceImpl) createGroupHierarchy(ctx context.Context, targetGr
 			if err != nil {
 				return err
 			}
+		} else if group.Kind != string(view.KindGroup) {
+			return fmt.Errorf("package %s exists but is not a group (kind: %s)", groupId, group.Kind)
 		}
 	}
 	return nil
@@ -604,6 +617,8 @@ func (s *snapshotServiceImpl) createGroupIfRequired(ctx context.Context, id stri
 		if err != nil {
 			return err
 		}
+	} else if group.Kind != string(view.KindGroup) {
+		return fmt.Errorf("package %s exists but is not a group (kind: %s)", id, group.Kind)
 	}
 	return nil
 }
@@ -619,9 +634,10 @@ func (s *snapshotServiceImpl) prepareDashboard(ctx context.Context, groupId stri
 		if err != nil {
 			return "", fmt.Errorf("unable to get group %s: %s", groupId, err)
 		}
-		//todo what if group.Kind != "group"?
 		if group == nil {
 			return "", fmt.Errorf("prepare snapshot failed: group with id %s doesn't exist", groupId)
+		} else if group.Kind != string(view.KindGroup) {
+			return "", fmt.Errorf("package %s exists but is not a group (kind: %s)", groupId, group.Kind)
 		}
 
 		_, err = s.apihubClient.CreatePackage(ctx, view.PackageCreateRequest{
@@ -633,6 +649,8 @@ func (s *snapshotServiceImpl) prepareDashboard(ctx context.Context, groupId stri
 		if err != nil {
 			return "", fmt.Errorf("unable to create dashboard %s in group: %s. Error - %s", utils.ToId("snapshot-dash"), groupId, err.Error())
 		}
+	} else if dashboard.Kind != string(view.KindDashbord) {
+		return "", fmt.Errorf("package %s exists but is not a dashboard (kind: %s)", dashboardId, dashboard.Kind)
 	}
 	return dashboardId, nil
 }
@@ -660,6 +678,8 @@ func (s *snapshotServiceImpl) preparePackages(ctx context.Context, services []vi
 				if err != nil {
 					return fmt.Errorf("failed to create package %s: %s", parentId+"."+utils.ToId(svc.Id), err)
 				}
+			} else if pkg.Kind != string(view.KindPackage) {
+				return fmt.Errorf("package %s exists but is not a package (kind: %s)", svc.Id, pkg.Kind)
 			}
 			ids[i] = pkgId
 			return nil

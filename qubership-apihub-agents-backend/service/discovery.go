@@ -131,7 +131,7 @@ func (d discoveryServiceImpl) StartDiscovery(ctx context.Context, agentId string
 
 func (d discoveryServiceImpl) copyWorkspaceServicesStructure(ctx context.Context, srcWorkspaceId string, dstWorkspaceId string, serviceNames []string, defaultRole string) error {
 	mutex := &sync.Mutex{}
-	srcPackagesToCopy := make([]*view.SimplePackage, 0)
+	srcPackagesToCopy := make([]*view.PackagesInfo, 0)
 
 	wg := sync.WaitGroup{}
 	errMap := sync.Map{}
@@ -187,7 +187,6 @@ func (d discoveryServiceImpl) copyWorkspaceServicesStructure(ctx context.Context
 			Alias:       srcWorkspaceId,
 			Description: fmt.Sprintf("Group to sync packages from '%v' workspace during service discovery", srcWorkspaceId),
 			DefaultRole: defaultRole,
-			// ExcludeFromSearch:, //todo ??
 		})
 	} else {
 		if productPackage.Kind != string(view.KindGroup) {
@@ -247,7 +246,6 @@ func (d discoveryServiceImpl) copyWorkspaceServicesStructure(ctx context.Context
 							ImageUrl:              srcParent.ImageUrl,
 							DefaultRole:           defaultRole,
 							ReleaseVersionPattern: srcParent.ReleaseVersionPattern,
-							// ExcludeFromSearch:, //todo ??
 						})
 						seenPackages[dstParentId] = struct{}{}
 					}
@@ -273,7 +271,6 @@ func (d discoveryServiceImpl) copyWorkspaceServicesStructure(ctx context.Context
 				DefaultRole:           defaultRole,
 				ReleaseVersionPattern: srcPackage.ReleaseVersionPattern,
 				ServiceName:           srcPackage.ServiceName,
-				// ExcludeFromSearch:, //todo ??
 			})
 			mutex.Unlock()
 		})
