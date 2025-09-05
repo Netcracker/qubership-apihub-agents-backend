@@ -27,7 +27,13 @@ WORKDIR /workspace/qubership-apihub-agents-backend
 RUN GOSUMDB=off CGO_ENABLED=0 go mod tidy && go mod download && GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build .
 
 
-FROM docker.io/golang:1.23.4-alpine3.21
+FROM docker.io/alpine:3.22.1
+
+ARG GIT_BRANCH=unknown
+ARG GIT_HASH=unknown
+
+ENV GIT_BRANCH=$GIT_BRANCH
+ENV GIT_HASH=$GIT_HASH
 
 USER root
 
