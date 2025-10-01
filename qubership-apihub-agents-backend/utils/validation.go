@@ -16,8 +16,10 @@ package utils
 
 import (
 	"fmt"
+	"maps"
 	"net/http"
 	"reflect"
+	"slices"
 	"strings"
 
 	"github.com/Netcracker/qubership-apihub-agents-backend/exception"
@@ -38,25 +40,24 @@ func ValidateObject(object interface{}) error {
 	if err == nil {
 		return nil
 	}
-	missingParams := make([]string, 0) //todo do not add or remove duplicate fields (e.g. arrays validations)
-	for _, err := range err.(validator.ValidationErrors) {
-		if err.Tag() == "required" {
-			missingParams = append(missingParams, err.StructNamespace())
+	missingParamsSet := make(map[string]struct{})
+	for _, verr := range err.(validator.ValidationErrors) {
+		if verr.Tag() == "required" {
+			missingParamsSet[verr.StructNamespace()] = struct{}{}
 		}
 	}
-	if len(missingParams) == 0 {
+	if len(missingParamsSet) == 0 {
 		return nil
 	}
 	return &exception.CustomError{
 		Status:  http.StatusBadRequest,
 		Code:    exception.RequiredParamsMissing,
 		Message: exception.RequiredParamsMissingMsg,
-		Params:  map[string]interface{}{"params": strings.Join(getValidatedValuesTags(object, missingParams), ", ")},
+		Params:  map[string]interface{}{"params": strings.Join(getValidatedValuesTags(object, slices.Collect(maps.Keys(missingParamsSet))), ", ")},
 	}
 }
 
 func getValidatedValuesTags(b interface{}, targetNames []string) []string {
-	//TODO: doesn't work for documents
 	result := make([]string, 0)
 	for i := 0; i < len(targetNames); i++ {
 		reflectValue := reflect.ValueOf(b)
