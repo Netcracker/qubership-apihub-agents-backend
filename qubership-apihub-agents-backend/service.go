@@ -41,6 +41,8 @@ func main() {
 		panic(err)
 	}
 
+	setLogLevel(systemInfoService.GetLogLevel())
+
 	basePath := systemInfoService.GetBasePath()
 	r := mux.NewRouter().SkipClean(true).UseEncodedPath()
 
@@ -121,9 +123,9 @@ func main() {
 	namespaceSecurityService := service.NewNamespaceSecurityService(agentClient, apihubClient, namespaceSecurityRepository, agentService, snapshotService, apiKeyService, userService, systemInfoService)
 	excelService := service.NewExcelService(namespaceSecurityRepository, apihubClient)
 	cleanupService := service.NewCleanupService(apihubClient)
-	err = cleanupService.CreateDraftsCleanupJob(systemInfoService.GetDraftsCleanupSchedule())
+	err = cleanupService.CreateSnapshotsCleanupJob(systemInfoService.GetSnapshotsCleanupSchedule(), systemInfoService.GetSnapshotsTTLDays())
 	if err != nil {
-		log.Warnf("failed to create drafts cleanup job: %v", err)
+		log.Warnf("failed to create snapshots cleanup job: %v", err)
 	}
 
 	agentController := controller.NewAgentController(agentService, agentClient)
@@ -217,4 +219,12 @@ func makeServer(systemInfoService service.SystemInfoService, r *mux.Router) *htt
 		WriteTimeout: 600 * time.Second,
 		ReadTimeout:  60 * time.Second,
 	}
+}
+
+func setLogLevel(logLevelStr string) {
+	logLevel, err := log.ParseLevel(logLevelStr)
+	if err != nil {
+		logLevel = log.InfoLevel
+	}
+	log.SetLevel(logLevel)
 }

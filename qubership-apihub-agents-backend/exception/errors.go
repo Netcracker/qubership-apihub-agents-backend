@@ -16,7 +16,7 @@ package exception
 
 import (
 	"fmt"
-	"strings"
+	"regexp"
 )
 
 type CustomError struct {
@@ -30,8 +30,8 @@ type CustomError struct {
 func (c CustomError) Error() string {
 	msg := c.Message
 	for k, v := range c.Params {
-		//todo make smart replace (e.g. now it replaces $projectId if we have $project in params)
-		msg = strings.ReplaceAll(msg, "$"+k, fmt.Sprintf("%v", v))
+		pattern := regexp.MustCompile(`\$` + regexp.QuoteMeta(k) + `\b`)
+		msg = pattern.ReplaceAllString(msg, fmt.Sprintf("%v", v))
 	}
 	return msg
 }

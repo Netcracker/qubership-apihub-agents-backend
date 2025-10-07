@@ -26,19 +26,20 @@ import (
 const (
 	BASE_PATH = "BASE_PATH"
 
-	POSTGRESQL_HOST         = "AGENTS_BACKEND_POSTGRESQL_HOST"
-	POSTGRESQL_PORT         = "AGENTS_BACKEND_POSTGRESQL_PORT"
-	POSTGRESQL_DB_NAME      = "AGENTS_BACKEND_POSTGRESQL_DB_NAME"
-	POSTGRESQL_USERNAME     = "AGENTS_BACKEND_POSTGRESQL_USERNAME"
-	POSTGRESQL_PASSWORD     = "AGENTS_BACKEND_POSTGRESQL_PASSWORD"
-	APIHUB_URL              = "APIHUB_URL"
-	APIHUB_ACCESS_TOKEN     = "APIHUB_ACCESS_TOKEN"
-	DEFAULT_WORKSPACE_ID    = "DEFAULT_WORKSPACE_ID"
-	DRAFTS_CLEANUP_SCHEDULE = "DRAFTS_CLEANUP_SCHEDULE"
-	INSECURE_PROXY          = "INSECURE_PROXY"
-	LISTEN_ADDRESS          = "LISTEN_ADDRESS"
-	ORIGIN_ALLOWED          = "ORIGIN_ALLOWED"
-	LOG_LEVEL               = "LOG_LEVEL"
+	POSTGRESQL_HOST            = "AGENTS_BACKEND_POSTGRESQL_HOST"
+	POSTGRESQL_PORT            = "AGENTS_BACKEND_POSTGRESQL_PORT"
+	POSTGRESQL_DB_NAME         = "AGENTS_BACKEND_POSTGRESQL_DB_NAME"
+	POSTGRESQL_USERNAME        = "AGENTS_BACKEND_POSTGRESQL_USERNAME"
+	POSTGRESQL_PASSWORD        = "AGENTS_BACKEND_POSTGRESQL_PASSWORD"
+	APIHUB_URL                 = "APIHUB_URL"
+	APIHUB_ACCESS_TOKEN        = "APIHUB_ACCESS_TOKEN"
+	DEFAULT_WORKSPACE_ID       = "DEFAULT_WORKSPACE_ID"
+	SNAPSHOTS_CLEANUP_SCHEDULE = "SNAPSHOTS_CLEANUP_SCHEDULE"
+	SNAPSHOTS_TTL_DAYS         = "SNAPSHOTS_TTL_DAYS"
+	INSECURE_PROXY             = "INSECURE_PROXY"
+	LISTEN_ADDRESS             = "LISTEN_ADDRESS"
+	ORIGIN_ALLOWED             = "ORIGIN_ALLOWED"
+	LOG_LEVEL                  = "LOG_LEVEL"
 )
 
 type SystemInfoService interface {
@@ -54,7 +55,8 @@ type SystemInfoService interface {
 	GetApihubUrl() string
 	GetApihubAccessToken() string
 	GetDefaultWorkspaceId() string
-	GetDraftsCleanupSchedule() string
+	GetSnapshotsCleanupSchedule() string
+	GetSnapshotsTTLDays() int
 	InsecureProxyEnabled() bool
 	GetListenAddress() string
 	GetOriginAllowed() string
@@ -88,7 +90,8 @@ func (s systemInfoServiceImpl) Init() error {
 	s.setApihubUrl()
 	s.setApihubAccessToken()
 	s.setDefaultWorkspaceId()
-	s.setDraftsCleanupSchedule()
+	s.setSnapshotsCleanupSchedule()
+	s.setSnapshotsTTLDays()
 	s.setInsecureProxy()
 
 	s.setListenAddress()
@@ -220,17 +223,33 @@ func (s systemInfoServiceImpl) setInsecureProxy() {
 	s.systemInfoMap[INSECURE_PROXY] = insecureProxy
 }
 
-func (s systemInfoServiceImpl) setDraftsCleanupSchedule() {
-	schedule := os.Getenv(DRAFTS_CLEANUP_SCHEDULE)
+func (s systemInfoServiceImpl) setSnapshotsCleanupSchedule() {
+	schedule := os.Getenv(SNAPSHOTS_CLEANUP_SCHEDULE)
 	if schedule == "" {
-		//TODO: default value should be aligned with other cleanup jobs in APIHUB
-		schedule = "0 2 * * 0" // 2:00 AM on Sunday
+		schedule = "0 22 * * 0" // at 10:00 PM on Sunday
 	}
-	s.systemInfoMap[DRAFTS_CLEANUP_SCHEDULE] = schedule
+	s.systemInfoMap[SNAPSHOTS_CLEANUP_SCHEDULE] = schedule
 }
 
-func (s systemInfoServiceImpl) GetDraftsCleanupSchedule() string {
-	return s.systemInfoMap[DRAFTS_CLEANUP_SCHEDULE].(string)
+func (s systemInfoServiceImpl) GetSnapshotsCleanupSchedule() string {
+	return s.systemInfoMap[SNAPSHOTS_CLEANUP_SCHEDULE].(string)
+}
+
+func (s systemInfoServiceImpl) setSnapshotsTTLDays() {
+	envVal := os.Getenv(SNAPSHOTS_TTL_DAYS)
+	if envVal == "" {
+		envVal = "183" //6 months
+	}
+	val, err := strconv.Atoi(envVal)
+	if err != nil {
+		log.Errorf("failed to parse %v env value: %v. Value by default - 183", SNAPSHOTS_TTL_DAYS, err.Error())
+		val = 183
+	}
+	s.systemInfoMap[SNAPSHOTS_TTL_DAYS] = val
+}
+
+func (s systemInfoServiceImpl) GetSnapshotsTTLDays() int {
+	return s.systemInfoMap[SNAPSHOTS_TTL_DAYS].(int)
 }
 
 func (s systemInfoServiceImpl) InsecureProxyEnabled() bool {
