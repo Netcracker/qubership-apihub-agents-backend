@@ -21,6 +21,8 @@ import (
 	"runtime/debug"
 	"sync"
 	"time"
+    
+    "runtime/coverage"
 
 	"github.com/Netcracker/qubership-apihub-agents-backend/client"
 	"github.com/Netcracker/qubership-apihub-agents-backend/controller"
@@ -169,6 +171,11 @@ func main() {
 
 	r.HandleFunc("/v3/api-docs/apihub-swagger-config", apiDocsController.GetSpecsUrls).Methods(http.MethodGet)
 	r.HandleFunc("/v3/api-docs/{specName}", apiDocsController.GetSpec).Methods(http.MethodGet)
+    
+    r.HandleFunc("/debug/flush-coverage", func(w http.ResponseWriter, r *http.Request) {
+			flushCoverage()
+			w.Write([]byte("ok"))
+		}).Methods(http.MethodGet)
 
 	r.HandleFunc("/live", healthController.HandleLiveRequest).Methods(http.MethodGet)
 	r.HandleFunc("/ready", healthController.HandleReadyRequest).Methods(http.MethodGet)
@@ -227,4 +234,17 @@ func setLogLevel(logLevelStr string) {
 		logLevel = log.InfoLevel
 	}
 	log.SetLevel(logLevel)
+}
+
+
+func flushCoverage() {
+	dir := os.Getenv("GOCOVERDIR")
+	log.Printf("coverage: flushing to %q", dir)
+
+	if err := coverage.WriteMetaDir(dir); err != nil {
+		log.Printf("coverage: WriteMetaDir error: %v", err)
+	}
+	if err := coverage.WriteCountersDir(dir); err != nil {
+		log.Printf("coverage: WriteCountersDir error: %v", err)
+	}
 }

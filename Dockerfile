@@ -24,7 +24,7 @@ COPY qubership-apihub-agents-backend ./qubership-apihub-agents-backend
 
 WORKDIR /workspace/qubership-apihub-agents-backend
 
-RUN GOSUMDB=off CGO_ENABLED=0 go mod tidy && go mod download && GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build .
+RUN GOSUMDB=off CGO_ENABLED=0 go mod tidy && go mod download && GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -cover -covermode=atomic -coverpkg=./... .
 
 
 FROM docker.io/alpine:3.22.1
@@ -46,8 +46,10 @@ COPY --from=builder /workspace/qubership-apihub-agents-backend/qubership-apihub-
 COPY --from=builder /workspace/qubership-apihub-agents-backend/resources ./resources
 COPY docs/api ./api
 
+RUN mkdir cov
 RUN chmod -R a+rwx /app
 
 USER 10001
 
+ENV GOCOVERDIR=./cov
 ENTRYPOINT ["./qubership-apihub-agents-backend"]
