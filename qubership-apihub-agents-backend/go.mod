@@ -3,6 +3,7 @@ module github.com/Netcracker/qubership-apihub-agents-backend
 go 1.25.1
 
 require (
+	github.com/Netcracker/qubership-apihub-commons-go/api-spec-exposer v0.0.0-20251121133701-a8c7c0a39ad0
 	github.com/go-pg/pg/v10 v10.14.0
 	github.com/go-playground/validator/v10 v10.28.0
 	github.com/google/uuid v1.6.0
