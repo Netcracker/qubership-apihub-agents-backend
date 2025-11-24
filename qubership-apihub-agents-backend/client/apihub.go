@@ -623,7 +623,7 @@ func (a apihubClientImpl) GetSystemInfo(ctx context.Context) (*view.ApihubSystem
 
 func checkUnauthorized(resp *resty.Response) error {
 	if resp != nil && (resp.StatusCode() == http.StatusUnauthorized || resp.StatusCode() == http.StatusForbidden) {
-		log.Errorf("Incorrect api key detected!")
+		log.Errorf("Incorrect api key detected! Response: %+v", resp)
 		return &exception.CustomError{
 			Status:  http.StatusFailedDependency,
 			Code:    exception.NoApihubAccess,
