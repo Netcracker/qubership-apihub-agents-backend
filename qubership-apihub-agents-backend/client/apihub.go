@@ -197,6 +197,24 @@ func (a apihubClientImpl) CreatePackage(ctx context.Context, pkg view.PackageCre
 	if err != nil {
 		return "", err
 	}
+	if resp.StatusCode() == http.StatusConflict {
+		// Package already exists, construct ID from request and fetch it
+		packageId := pkg.ParentId
+		if packageId != "" {
+			packageId = packageId + "." + pkg.Alias
+		} else {
+			packageId = pkg.Alias
+		}
+		existingPackage, err := a.GetPackageById(ctx, packageId)
+		if err != nil {
+			return "", fmt.Errorf("package already exists but failed to get package by id %s: %s", packageId, err)
+		}
+		if existingPackage == nil {
+			return "", fmt.Errorf("received 409 conflict, but package with id %s not found", packageId)
+		}
+		log.Warnf("Package with id %s already exists (parentId: %s, kind: %s, name: %s), but we tried to create it anyway", existingPackage.Id, pkg.ParentId, pkg.Kind, pkg.Name)
+		return existingPackage.Id, nil
+	}
 	if resp.StatusCode() != http.StatusCreated {
 		if authErr := checkUnauthorized(resp); authErr != nil {
 			return "", authErr

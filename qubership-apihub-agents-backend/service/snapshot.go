@@ -513,41 +513,9 @@ func (s *snapshotServiceImpl) startSnapshot(ctx context.Context, namespace strin
 
 func (s *snapshotServiceImpl) prepareNamespaceGroup(ctx context.Context, namespace string, workspaceId string, cloudName string) (string, error) {
 	namespaceGroupId := fmt.Sprintf("%s.%s.%s.%s", workspaceId, view.DefaultSnapshotsGroupAlias, utils.ToId(cloudName), utils.ToId(namespace)) // Generate group id for namespace
-
-	namespaceGroup, err := s.apihubClient.GetPackageById(ctx, namespaceGroupId)
+	err := s.createGroupHierarchy(ctx, namespaceGroupId)
 	if err != nil {
-		return "", fmt.Errorf("unable to get group %s: %s", namespaceGroupId, err)
-	}
-	if namespaceGroup == nil {
-		cloudGroupParentId := fmt.Sprintf("%s.%s", workspaceId, view.DefaultSnapshotsGroupAlias)
-		parentGroup, err := s.apihubClient.GetPackageById(ctx, cloudGroupParentId)
-		if err != nil {
-			return "", fmt.Errorf("unable to get group %s: %s", cloudGroupParentId, err)
-		}
-		if parentGroup == nil {
-			err = s.createGroupHierarchy(ctx, cloudGroupParentId)
-			if err != nil {
-				return "", fmt.Errorf("unable to create cloud parent group %s: %s", cloudGroupParentId, err)
-			}
-		} else if parentGroup.Kind != string(view.KindGroup) {
-			return "", fmt.Errorf("package %s exists but is not a group (kind: %s)", cloudGroupParentId, parentGroup.Kind)
-		}
-		cloudGroupId := fmt.Sprintf("%s.%s", cloudGroupParentId, utils.ToId(cloudName))
-		err = s.createGroupIfRequired(ctx, cloudGroupId, cloudName, cloudGroupParentId)
-		if err != nil {
-			return "", fmt.Errorf("unable to create cloud group %s: %s", cloudGroupId, err)
-		}
-		_, err = s.apihubClient.CreatePackage(ctx, view.PackageCreateRequest{
-			ParentId: cloudGroupId,
-			Kind:     string(view.KindGroup),
-			Name:     namespace,
-			Alias:    utils.ToId(namespace),
-		})
-		if err != nil {
-			return "", fmt.Errorf("unable to create namespace group %s: %s", namespaceGroupId, err)
-		}
-	} else if namespaceGroup.Kind != string(view.KindGroup) {
-		return "", fmt.Errorf("package %s exists but is not a group (kind: %s)", namespaceGroupId, namespaceGroup.Kind)
+		return "", fmt.Errorf("unable to create group hierarchy %s: %s", namespaceGroupId, err)
 	}
 	return namespaceGroupId, nil
 }
