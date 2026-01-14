@@ -1,12 +1,12 @@
 openapi: 3.0.3
 info:
-  title: Qubership APIHUB Agents Backend Admin API
-  description: Admin REST API for managing debug and administrative operations in Qubership APIHUB Agents Backend
+  title: Qubership APIHUB Agents Backend Internal API
+  description: Internal REST API for Qubership APIHUB Agents Backend.
   license:
     name: qubership
     url: https://qubership.org
   version: "2024.2"
-  x-nc-api-audience: BWC
+  x-api-audience: internal
 
 servers:
   - url: https://{apihubAgentsBackend}.qubership.org
@@ -25,37 +25,21 @@ security:
   - ApiKeyAuth: []
   - PersonalAccessToken: []
 tags:
-  - name: Debug
-    description: Debug and logging operations
+  - name: Agents
+    description: Agent management operations
 paths:
-  /api/v1/debug/logs/checkLevel:
-    get:
-      tags:
-        - Debug
-      summary: Check log level
-      description: |
-        Check current log level.
-      operationId: checkLogLevel
-      responses:
-        "200":
-          description: Success
-          content:
-            text/plain:
-              schema:
-                type: string
-                description: Current log level
-        "401":
-          $ref: '#/components/responses/Unauthorized'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-  /api/v1/debug/logs/setLevel:
+  /api/v2/agents:
     post:
       tags:
-        - Debug
-      summary: Set log level
-      description: |
-        Set log level.
-      operationId: setLogLevel
+        - Agents
+      summary: Process agent signal
+      description: Process registration/keepalive message from an agent
+      operationId: processAgentSignal
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+        - ApiKeyAuth: []
+        - PersonalAccessToken: []
       requestBody:
         required: true
         content:
@@ -63,35 +47,47 @@ paths:
             schema:
               type: object
               required:
-                - level
+                - cloud
+                - namespace
+                - url
+                - backendVersion
               properties:
-                level:
+                cloud:
                   type: string
-                  description: Log level to set
-                  enum:
-                    - panic
-                    - fatal
-                    - error
-                    - warn
-                    - info
-                    - debug
-                    - trace
+                  description: Cloud where agent is deployed
+                namespace:
+                  type: string
+                  description: Namespace where agent is deployed
+                url:
+                  type: string
+                  description: Agent URL
+                backendVersion:
+                  type: string
+                  description: Backend version
+                name:
+                  type: string
+                  description: Agent name
+                agentVersion:
+                  type: string
+                  description: Agent version
       responses:
-        "200":
-          description: Success
+        '200':
+          description: Message successfully processed
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  level:
+                  version:
                     type: string
-                    description: Current log level
-        "400":
+                    description: Expected agent version
+        '400':
           $ref: '#/components/responses/BadRequest'
-        "401":
+        '401':
           $ref: '#/components/responses/Unauthorized'
-        "500":
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
           $ref: '#/components/responses/InternalServerError'
 components:
   schemas:
@@ -124,6 +120,12 @@ components:
             $ref: '#/components/schemas/CustomError'
     Unauthorized:
       description: Unauthorized access
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CustomError'
+    Forbidden:
+      description: Access forbidden
       content:
         application/json:
           schema:
