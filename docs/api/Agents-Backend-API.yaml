@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Qubership APIHUB Agents Backend API
-  description: REST API for managing agents, discovery, snapshots, security checks, and service specifications in Qubership APIHUB agents backend
+  description: REST API for managing agents, discovery, snapshots, security checks, and service specifications in Qubership APIHUB Agents Backend
   license:
     name: qubership
     url: https://qubership.org

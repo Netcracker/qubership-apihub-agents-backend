@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Qubership APIHUB Agents Backend Admin API
-  description: Admin REST API for managing debug and administrative operations in Qubership APIHUB Agents Backend
+  description: External API contract for system administrators.
   license:
     name: qubership
     url: https://qubership.org
