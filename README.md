@@ -35,7 +35,7 @@ Agent context is split between a **central store** and **this repository**:
 | Scope | Location |
 |-------|----------|
 | Generic skills/rules (Go conventions, planner, …) | [`qubership-apihub-ci/agent-packages`](https://github.com/Netcracker/qubership-apihub-ci/tree/apm_migration/agent-packages) |
-| Agents-backend-specific packages | [`agent-packages/`](agent-packages/) in this repo |
+| Agents-backend-specific packages | [`agent-packages/`](agent-packages/) in this repository |
 | Deployed harness output | `.cursor/` and `.claude/` (committed; refresh with APM) |
 
 After changing package sources or `apm.yml`, refresh deployed harness files:
