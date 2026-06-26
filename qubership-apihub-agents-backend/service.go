@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	_ "net/http/pprof"
+	"os"
 	"runtime/debug"
 	"sync"
 	"time"
@@ -24,19 +25,21 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+func init() {
+	setLogLevel(os.Getenv("LOG_LEVEL"))
+}
+
 func main() {
 	systemInfoService, err := service.NewSystemInfoService()
 	if err != nil {
 		panic(err)
 	}
 
-	setLogLevel(systemInfoService.GetLogLevel())
-
 	basePath := systemInfoService.GetBasePath()
 	r := mux.NewRouter().SkipClean(true).UseEncodedPath()
 	r.Use(midldleware.WriteDeadlineMiddleware)
 
-	dbCreds := systemInfoService.GetDBCredsFromEnv()
+	dbCreds := systemInfoService.GetDBCreds()
 	cp := db.NewConnectionProvider(dbCreds)
 	initSrv := makeServer(systemInfoService, r)
 
@@ -222,9 +225,9 @@ func makeServer(systemInfoService service.SystemInfoService, r *mux.Router) *htt
 
 	corsOptions = append(corsOptions, handlers.AllowedHeaders([]string{"Connection", "Accept-Encoding", "Content-Encoding", "X-Requested-With", "Content-Type", "Authorization"}))
 
-	allowedOrigin := systemInfoService.GetOriginAllowed()
-	if allowedOrigin != "" {
-		corsOptions = append(corsOptions, handlers.AllowedOrigins([]string{allowedOrigin}))
+	allowedOrigins := systemInfoService.GetAllowedOrigins()
+	if len(allowedOrigins) > 0 {
+		corsOptions = append(corsOptions, handlers.AllowedOrigins(allowedOrigins))
 	}
 	corsOptions = append(corsOptions, handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"}))
 
