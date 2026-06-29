@@ -22,6 +22,7 @@ import (
 	"github.com/gorilla/mux"
 
 	"github.com/Netcracker/qubership-apihub-agents-backend/service"
+	"github.com/Netcracker/qubership-apihub-agents-backend/utils"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -33,6 +34,9 @@ func main() {
 	systemInfoService, err := service.NewSystemInfoService()
 	if err != nil {
 		panic(err)
+	}
+	if err := utils.ValidateTLSAtStartup(); err != nil {
+		log.Fatalf("TLS configuration failed: %v", err)
 	}
 
 	basePath := systemInfoService.GetBasePath()
@@ -95,8 +99,14 @@ func main() {
 	_ = <-initSrvStoppedChan // wait for the init srv to stop to avoid multiple servers started race condition
 	log.Infof("Migration step passed, continue initialization")
 
-	agentClient := client.NewAgentClient(systemInfoService.GetApihubAccessToken())
-	apihubClient := client.NewApihubClient(systemInfoService.GetApihubUrl(), systemInfoService.GetApihubAccessToken())
+	agentClient, err := client.NewAgentClient(systemInfoService.GetApihubAccessToken())
+	if err != nil {
+		log.Fatalf("Failed to create AgentClient: %v", err)
+	}
+	apihubClient, err := client.NewApihubClient(systemInfoService.GetApihubUrl(), systemInfoService.GetApihubAccessToken())
+	if err != nil {
+		log.Fatalf("Failed to create ApihubClient: %v", err)
+	}
 
 	err = security.SetupGoGuardian(apihubClient)
 	if err != nil {
@@ -126,7 +136,10 @@ func main() {
 	snapshotsController := controller.NewSnapshotController(snapshotService, agentService)
 	specificationsController := controller.NewSpecificationsController(agentClient, agentService)
 	namespaceSecurityController := controller.NewNamespaceSecurityController(namespaceSecurityService, excelService)
-	agentProxyController := controller.NewAgentProxyController(agentService)
+	agentProxyController, err := controller.NewAgentProxyController(agentService)
+	if err != nil {
+		log.Fatalf("Failed to create AgentProxyController: %v", err)
+	}
 	logsController := controller.NewLogsController()
 
 	healthController := controller.NewHealthController(readyChan)
