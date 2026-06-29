@@ -1138,7 +1138,7 @@ paths:
         Forwards the incoming GET request to the specified backend service instance and returns
         the service response. Preserves the HTTP method, request body, and most headers; query
         string and path fragments in `{path}` are appended to the target URL as-is. Use
-        `X-Apihub-Authorization` for nc-service authentication when `security.insecureProxy`
+        `X-Apihub-Authorization` for agents-backend authentication when `security.insecureProxy`
         in `config.yaml` is not enabled. **Deprecated** — use `/api/v2/agents/.../proxy/{path}` instead.
       operationId: getAgentsIdNamespacesIdServicesProxy
       security:
@@ -1164,7 +1164,7 @@ paths:
           schema:
             type: string
           description: |
-            nc-service authorization:
+            agents-backend authorization:
               * if `security.insecureProxy` in `config.yaml` is false or omitted, then X-Apihub-Authorization is **required**
               * if `security.insecureProxy` in `config.yaml` is true, then X-Apihub-Authorization is optional
       responses:
