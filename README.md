@@ -26,4 +26,4 @@ Presence of this plug-in in Qubership-APIHUB deployments enables `Agents` tab in
 
 Just run `build_golang_binary.cmd` file.
 
-For Docker builds, use `build_docker_image.cmd`.
+For Docker builds, use `build_docker_image.cmd`. 
