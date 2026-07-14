@@ -59,7 +59,7 @@ jobs:
       repo-name: qubership-api-linter-service
 
   run-e2e-tests:
-    uses: netcracker/qubership-apihub-ci/.github/workflows/run-e2e-tests-kind.yaml@feature/k8s-ci
+    uses: netcracker/qubership-apihub-ci/.github/workflows/run-e2e-tests-kind.yaml@main
     needs:
       - build-docker-image
       - calculate-backend-tag
