@@ -31,9 +31,16 @@ func (d discoveryControllerImpl) StartDiscovery(w http.ResponseWriter, r *http.R
 	failOnError, queryParamErr := getFailOnErrorQueryParam(r)
 	if queryParamErr != nil {
 		respondWithError(w, "failed to parse failOnError query param", queryParamErr)
+		return
 	}
 
-	err := d.discoveryService.StartDiscovery(secctx.MakeUserContext(r), agentId, namespace, workspaceId, failOnError)
+	req, bodyErr := getDiscoveryRequestBody(w, r)
+	if bodyErr != nil {
+		respondWithError(w, "failed to parse discovery request body", bodyErr)
+		return
+	}
+
+	err := d.discoveryService.StartDiscovery(secctx.MakeUserContext(r), agentId, namespace, workspaceId, failOnError, req)
 	if err != nil {
 		respondWithError(w, "failed to start discovery process", err)
 		return

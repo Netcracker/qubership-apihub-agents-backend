@@ -10,16 +10,17 @@ import (
 	"time"
 
 	"github.com/Netcracker/qubership-apihub-agents-backend/exception"
-	"github.com/Netcracker/qubership-apihub-agents-backend/utils"
 	"github.com/Netcracker/qubership-apihub-agents-backend/secctx"
+	"github.com/Netcracker/qubership-apihub-agents-backend/utils"
 	"github.com/Netcracker/qubership-apihub-agents-backend/view"
+	log "github.com/sirupsen/logrus"
 	"gopkg.in/resty.v1"
 )
 
 type AgentClient interface {
 	GetNamespaces(ctx context.Context, agentUrl string) (*view.AgentNamespaces, error)
 	ListServiceNames(ctx context.Context, agentUrl string, namespace string) (*view.ServiceNamesResponse, error)
-	StartDiscovery(ctx context.Context, namespace string, workspaceId string, agentUrl string, failOnError bool) error
+	StartDiscovery(ctx context.Context, namespace string, workspaceId string, agentUrl string, failOnError bool, discoveryReq view.DiscoveryRequest) error
 	ListServices_deprecated(ctx context.Context, namespace string, workspaceId string, agentUrl string) (*view.ServiceListResponse_deprecated, error)
 	ListServices(ctx context.Context, namespace string, workspaceId string, agentUrl string) (*view.ServiceListResponse, error)
 	GetServiceSpecification(ctx context.Context, namespace string, workspaceId string, serviceId string, fileId string, agentUrl string) ([]byte, error)
@@ -97,8 +98,11 @@ func (a agentClientImpl) ListServiceNames(ctx context.Context, agentUrl string, 
 	return &serviceNames, nil
 }
 
-func (a agentClientImpl) StartDiscovery(ctx context.Context, namespace string, workspaceId string, agentUrl string, failOnError bool) error {
+func (a agentClientImpl) StartDiscovery(ctx context.Context, namespace string, workspaceId string, agentUrl string, failOnError bool, discoveryReq view.DiscoveryRequest) error {
 	req := a.makeRequest(ctx)
+	if len(discoveryReq.Services) > 0 {
+		req.SetBody(discoveryReq)
+	}
 	resp, err := req.Post(fmt.Sprintf("%s/api/v2/namespaces/%s/workspaces/%s/discover?failOnError=%v", agentUrl, namespace, workspaceId, failOnError))
 	if err != nil {
 		return fmt.Errorf("failed to start discovery for namespace - %s. Error - %s", namespace, err.Error())
@@ -106,12 +110,18 @@ func (a agentClientImpl) StartDiscovery(ctx context.Context, namespace string, w
 
 	if resp.StatusCode() != http.StatusAccepted {
 		if resp.StatusCode() == http.StatusNotFound {
+			log.Warnf("agent %s returned 404 for discovery start (namespace %s, workspace %s); reporting success for backward compatibility", agentUrl, namespace, workspaceId)
 			return nil
 		}
 		if authErr := checkUnauthorized(resp); authErr != nil {
 			return authErr
 		}
-		return fmt.Errorf("failed to start discovery for namespace - %s: status code %d %v", namespace, resp.StatusCode(), err)
+		if resp.StatusCode() == http.StatusBadRequest || resp.StatusCode() == http.StatusConflict {
+			if customErr := checkCustomError(resp); customErr != nil {
+				return customErr
+			}
+		}
+		return fmt.Errorf("failed to start discovery for namespace - %s: status code %d, body: %s", namespace, resp.StatusCode(), resp.Body())
 	}
 	return nil
 }

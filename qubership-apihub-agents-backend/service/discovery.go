@@ -12,10 +12,11 @@ import (
 	"github.com/Netcracker/qubership-apihub-agents-backend/secctx"
 	"github.com/Netcracker/qubership-apihub-agents-backend/utils"
 	"github.com/Netcracker/qubership-apihub-agents-backend/view"
+	log "github.com/sirupsen/logrus"
 )
 
 type DiscoveryService interface {
-	StartDiscovery(ctx context.Context, agentId string, namespace string, workspaceId string, failOnError bool) error
+	StartDiscovery(ctx context.Context, agentId string, namespace string, workspaceId string, failOnError bool, req view.DiscoveryRequest) error
 	GetDiscoveredServices_deprecated(ctx context.Context, agentId string, namespace string, workspaceId string) (*view.ServiceListResponse_deprecated, error)
 	GetDiscoveredServices(ctx context.Context, agentId string, namespace string, workspaceId string) (*view.ServiceListResponse, error)
 }
@@ -38,7 +39,7 @@ type discoveryServiceImpl struct {
 	permissionService  PermissionService
 }
 
-func (d discoveryServiceImpl) StartDiscovery(ctx context.Context, agentId string, namespace string, workspaceId string, failOnError bool) error {
+func (d discoveryServiceImpl) StartDiscovery(ctx context.Context, agentId string, namespace string, workspaceId string, failOnError bool, req view.DiscoveryRequest) error {
 	agent, err := d.agentService.GetAgent(agentId)
 	if err != nil {
 		return exception.CustomError{
@@ -113,7 +114,11 @@ func (d discoveryServiceImpl) StartDiscovery(ctx context.Context, agentId string
 		}
 	}
 
-	return d.agentClient.StartDiscovery(ctx, namespace, workspaceId, agent.AgentUrl, failOnError)
+	if len(req.Services) > 0 {
+		log.Infof("Starting discovery for namespace %v in workspace %v limited to %d requested service(s)", namespace, workspaceId, len(req.Services))
+	}
+
+	return d.agentClient.StartDiscovery(ctx, namespace, workspaceId, agent.AgentUrl, failOnError, req)
 }
 
 func (d discoveryServiceImpl) copyWorkspaceServicesStructure(ctx context.Context, srcWorkspaceId string, dstWorkspaceId string, serviceNames []string, defaultRole string) error {
