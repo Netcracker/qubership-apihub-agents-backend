@@ -22,8 +22,8 @@ type AgentClient interface {
 	ListServiceNames(ctx context.Context, agentUrl string, namespace string) (*view.ServiceNamesResponse, error)
 	StartDiscovery(ctx context.Context, namespace string, workspaceId string, agentUrl string, failOnError bool, discoveryReq view.DiscoveryRequest) error
 	ListServices_deprecated(ctx context.Context, namespace string, workspaceId string, agentUrl string) (*view.ServiceListResponse_deprecated, error)
-	ListServices(ctx context.Context, namespace string, workspaceId string, agentUrl string) (*view.ServiceListResponse, error)
-	GetServiceSpecification(ctx context.Context, namespace string, workspaceId string, serviceId string, fileId string, agentUrl string) ([]byte, error)
+	ListServices(ctx context.Context, namespace string, workspaceId string, agentUrl string, discoveryServices string) (*view.ServiceListResponse, error)
+	GetServiceSpecification(ctx context.Context, namespace string, workspaceId string, serviceId string, fileId string, agentUrl string, discoveryServices string) ([]byte, error)
 	SendEmptyServiceRequest(namespace string, serviceId string, agentUrl string, requestMethod string, requestPath string) (int, error)
 }
 
@@ -116,7 +116,7 @@ func (a agentClientImpl) StartDiscovery(ctx context.Context, namespace string, w
 		if authErr := checkUnauthorized(resp); authErr != nil {
 			return authErr
 		}
-		if resp.StatusCode() == http.StatusBadRequest || resp.StatusCode() == http.StatusConflict {
+		if resp.StatusCode() == http.StatusBadRequest {
 			if customErr := checkCustomError(resp); customErr != nil {
 				return customErr
 			}
@@ -150,9 +150,16 @@ func (a agentClientImpl) ListServices_deprecated(ctx context.Context, namespace 
 	return &serviceListResponse, nil
 }
 
-func (a agentClientImpl) ListServices(ctx context.Context, namespace string, workspaceId string, agentUrl string) (*view.ServiceListResponse, error) {
+func discoveryScopeQuery(discoveryServices string) string {
+	if discoveryServices == "" {
+		return ""
+	}
+	return "?services=" + url.QueryEscape(discoveryServices)
+}
+
+func (a agentClientImpl) ListServices(ctx context.Context, namespace string, workspaceId string, agentUrl string, discoveryServices string) (*view.ServiceListResponse, error) {
 	req := a.makeRequest(ctx)
-	resp, err := req.Get(fmt.Sprintf("%s/api/v3/namespaces/%s/workspaces/%s/services", agentUrl, namespace, workspaceId))
+	resp, err := req.Get(fmt.Sprintf("%s/api/v3/namespaces/%s/workspaces/%s/services%s", agentUrl, namespace, workspaceId, discoveryScopeQuery(discoveryServices)))
 	if err != nil {
 		return nil, fmt.Errorf("failed to get service for namespace - %s. Error - %s", namespace, err.Error())
 	}
@@ -174,9 +181,9 @@ func (a agentClientImpl) ListServices(ctx context.Context, namespace string, wor
 	return &serviceListResponse, nil
 }
 
-func (a agentClientImpl) GetServiceSpecification(ctx context.Context, namespace string, workspaceId string, serviceId string, fileId string, agentUrl string) ([]byte, error) {
+func (a agentClientImpl) GetServiceSpecification(ctx context.Context, namespace string, workspaceId string, serviceId string, fileId string, agentUrl string, discoveryServices string) ([]byte, error) {
 	req := a.makeRequest(ctx)
-	resp, err := req.Get(fmt.Sprintf("%s/api/v2/namespaces/%s/workspaces/%s/services/%s/specs/%s", agentUrl, namespace, workspaceId, url.PathEscape(serviceId), url.PathEscape(fileId)))
+	resp, err := req.Get(fmt.Sprintf("%s/api/v2/namespaces/%s/workspaces/%s/services/%s/specs/%s%s", agentUrl, namespace, workspaceId, url.PathEscape(serviceId), url.PathEscape(fileId), discoveryScopeQuery(discoveryServices)))
 	if err != nil {
 		return nil, fmt.Errorf("failed to get service specification. Error - %s", err.Error())
 	}

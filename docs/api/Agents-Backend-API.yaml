@@ -1562,6 +1562,7 @@ components:
           type: array
           items:
             type: string
+            minLength: 1
           description: |
             Service names to discover. Each entry is matched exactly and case-sensitively against
             the name reported as `serviceName` in the services listing - that is, the Kubernetes
@@ -1570,8 +1571,12 @@ components:
             One entry therefore selects every blue-green variant of that service: `apihub-be`
             matches both `apihub-be-v1` and `apihub-be-v2`. A raw Kubernetes service name such as
             `apihub-be-v1` matches nothing, so do not pass the `id` field of a previous response
-            here. Names not present in the namespace are ignored; compare `requestedServices`
-            against `services[].serviceName` in the services listing to find them.
+            here. An entry that is empty or carries leading or trailing whitespace can match no
+            service and is rejected with 400.
+
+            A name not present in the namespace, or one naming a service the agent excludes from
+            discovery by label, is ignored; compare `requestedServices` against
+            `services[].serviceName` in the services listing to find them.
           example:
             - apihub-be
             - apihub-fe
@@ -1579,8 +1584,10 @@ components:
     BadRequest:
       description: |
         Invalid request. Typical causes include malformed JSON, missing required fields, invalid
-        query parameters, or unrecognized enum values. The response body uses the CustomError
-        schema with remediation hints in the message and debug fields.
+        query parameters, unrecognized enum values, a request body larger than 1 MiB, or a
+        requested service name that is empty or carries leading or trailing whitespace. The
+        response body uses the CustomError schema with remediation hints in the message and debug
+        fields.
       content:
         application/json:
           schema:
