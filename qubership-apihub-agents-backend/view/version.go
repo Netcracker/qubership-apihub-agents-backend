@@ -29,6 +29,7 @@ type VersionContent struct {
 	PackageId                string                 `json:"packageId"`
 	Version                  string                 `json:"version"`
 	NotLatestRevision        bool                   `json:"notLatestRevision,omitempty"`
+	HasErrors                bool                   `json:"hasErrors"`
 }
 
 type VersionCreatedBy struct {
