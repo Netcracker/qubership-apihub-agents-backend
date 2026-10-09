@@ -75,7 +75,8 @@ type Baseline struct {
 }
 
 type BaselineVersion struct {
-	Version            string `json:"version"`
-	HasErrors          bool   `json:"hasErrors"`
-	ChangelogHasErrors bool   `json:"changelogHasErrors"`
+	Version             string `json:"version"`
+	ApiProcessorVersion string `json:"apiProcessorVersion"`
+	HasErrors           bool   `json:"hasErrors"`
+	ChangelogHasErrors  bool   `json:"changelogHasErrors"`
 }

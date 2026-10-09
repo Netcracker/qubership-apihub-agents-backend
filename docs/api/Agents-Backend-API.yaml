@@ -381,13 +381,16 @@ paths:
                               description: Baseline URL
                             versions:
                               type: array
-                              description: Versions of the baseline package that can be selected as previousVersion. Versions with build or changelog errors stay listed and carry the flags, so the client can mark them and block the selection.
+                              description: Versions of the baseline package that can be selected as previousVersion. Each entry carries the API processor version it was built with. Versions with build or changelog errors stay listed and carry the flags, so the client can mark them and block the selection.
                               items:
                                 type: object
                                 properties:
                                   version:
                                     type: string
                                     description: Version name
+                                  apiProcessorVersion:
+                                    type: string
+                                    description: Version of the API processor that built the version.
                                   hasErrors:
                                     type: boolean
                                     default: false
@@ -511,13 +514,16 @@ paths:
                               description: Baseline URL
                             versions:
                               type: array
-                              description: Versions of the baseline package that can be selected as previousVersion. Versions with build or changelog errors stay listed and carry the flags, so the client can mark them and block the selection.
+                              description: Versions of the baseline package that can be selected as previousVersion. Each entry carries the API processor version it was built with. Versions with build or changelog errors stay listed and carry the flags, so the client can mark them and block the selection.
                               items:
                                 type: object
                                 properties:
                                   version:
                                     type: string
                                     description: Version name
+                                  apiProcessorVersion:
+                                    type: string
+                                    description: Version of the API processor that built the version.
                                   hasErrors:
                                     type: boolean
                                     default: false
