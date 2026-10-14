@@ -999,6 +999,13 @@ paths:
                           items:
                             type: string
                           description: API types for this service
+                        hasErrors:
+                          type: boolean
+                          default: false
+                          description: The build of the service version in this snapshot detected at least one error. Snapshot content and changes summary for this service may be incomplete.
+                        changelogHasErrors:
+                          type: boolean
+                          description: Errors were detected while comparing this service version against its own previous version (directly or in its comparison references). The changes summary for this service may be incomplete. Present only when the service version has a previous version; omitted when no comparison was made.
                   viewSnapshotUrl:
                     type: string
                     description: URL to view the snapshot

@@ -30,6 +30,7 @@ type VersionContent struct {
 	Version                  string                 `json:"version"`
 	NotLatestRevision        bool                   `json:"notLatestRevision,omitempty"`
 	HasErrors                bool                   `json:"hasErrors"`
+	ChangelogHasErrors       *bool                  `json:"changelogHasErrors,omitempty"`
 }
 
 type VersionCreatedBy struct {

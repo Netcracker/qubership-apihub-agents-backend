@@ -173,6 +173,8 @@ func (s *snapshotServiceImpl) GetSnapshot(ctx context.Context, namespace string,
 				BaselineFound:            baselineFound,
 				BaselineVersionFound:     baselineVersionFound,
 				ApiTypes:                 packageVersion.ApiTypes,
+				HasErrors:                packageVersion.HasErrors,
+				ChangelogHasErrors:       packageVersion.ChangelogHasErrors,
 			}
 			if packageVersion.ChangeSummary != nil {
 				serviceWithChanges.Changes = packageVersion.ChangeSummary
